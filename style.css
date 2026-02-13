@@ -1,0 +1,152 @@
+:root{
+ --verde:#006636;
+ --verde2:#008c4a;
+ --verde3:#004d29;
+ --laranja:#d66a00;
+ --cinza:#f2f2f2;
+}
+
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:var(--cinza);
+ overflow:hidden;
+}
+
+.hidden{display:none}
+
+/* TELA INICIAL */
+.start{
+ position:fixed;
+ inset:0;
+ background:linear-gradient(135deg,var(--verde),var(--verde3));
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ color:#fff;
+ text-align:center;
+ z-index:999;
+}
+
+.logo-start{
+ width:240px;
+ max-width:70%;
+ margin-bottom:25px;
+ filter:drop-shadow(0 10px 20px rgba(0,0,0,.35));
+}
+
+.start button{
+ padding:14px 40px;
+ border:none;
+ border-radius:30px;
+ background:var(--laranja);
+ color:#fff;
+ font-size:16px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:.25s;
+}
+
+.start button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 6px 14px rgba(0,0,0,.3);
+}
+
+/* SISTEMA */
+.topo{
+ background:var(--verde);
+ color:#fff;
+ padding:15px;
+ text-align:center;
+ font-size:22px;
+}
+
+.container{display:flex;height:calc(100vh - 56px)}
+
+.menu{
+ width:220px;
+ background:var(--verde);
+ padding:15px;
+}
+
+.menu button{
+ width:100%;
+ margin-bottom:10px;
+ padding:12px;
+ border:none;
+ border-radius:8px;
+ background:var(--verde2);
+ color:#fff;
+ cursor:pointer;
+ transition:.2s;
+}
+
+.menu button:hover{background:var(--laranja)}
+
+.content{flex:1;padding:20px;overflow:auto}
+
+.box{
+ background:#fff;
+ padding:20px;
+ border-radius:14px;
+ max-width:1100px;
+}
+
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
+th{background:#eee}
+
+.total{
+ font-size:22px;
+ color:var(--laranja);
+ margin-top:15px;
+ font-weight:bold;
+}
+
+button.action{
+ margin-top:20px;
+ padding:10px 24px;
+ border:none;
+ border-radius:8px;
+ background:var(--verde);
+ color:#fff;
+ cursor:pointer;
+ transition:.2s;
+}
+
+button.action:hover{
+ background:var(--laranja);
+}
+
+.toast{
+ position:fixed;
+ bottom:20px;
+ right:20px;
+ background:var(--verde);
+ color:#fff;
+ padding:12px 20px;
+ border-radius:8px;
+ display:none;
+}
+
+/* BOTÕES GRÁFICO */
+#graficos button{
+ background:var(--verde);
+ color:#fff;
+ border:none;
+ padding:16px 36px;
+ border-radius:12px;
+ font-size:17px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:.25s;
+}
+
+#graficos button:hover{
+ background:var(--laranja);
+ transform:translateY(-3px);
+ box-shadow:0 8px 18px rgba(0,0,0,.25);
+}

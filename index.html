@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cerâmica Veredas | Gestão</title>
+
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- TELA INICIAL -->
+<div class="start" id="start">
+ <img src="assets/logo.png" class="logo-start" alt="Cerâmica Veredas">
+ <h1>Cerâmica Veredas</h1>
+ <p>Gestão inteligente para produção cerâmica</p>
+ <button onclick="entrar()">Iniciar</button>
+</div>
+
+<div id="sistema" class="hidden">
+
+<div class="topo">Cerâmica Veredas</div>
+
+<div class="container">
+
+<div class="menu">
+ <button data-tela="painel">Relatório</button>
+ <button data-tela="diaria">Produção Diária</button>
+ <button data-tela="semanal">Produção Semanal</button>
+ <button data-tela="estoque">Estoque</button>
+ <button data-tela="graficos">Gráficos</button>
+</div>
+
+<div class="content">
+
+<div id="painel">
+<div class="box">
+ <h2>Relatório Geral</h2>
+ <p>Total Diário: <b id="totalDiario">0</b></p>
+ <p>Total Semanal: <b id="totalSemanal">0</b></p>
+ <p>Total de Fornos: <b id="totalFornos">0</b></p>
+ <p>Eficiência por Forno: <b id="eficienciaForno">0</b></p>
+ <button class="action" onclick="exportarExcel()">Exportar Excel</button>
+</div>
+</div>
+
+<div id="diaria" class="hidden">
+<div class="box">
+<h2>Produção Diária</h2>
+<label>Data <input type="date" id="dataDiaria"></label>
+
+<table>
+<thead><tr><th>Tipo</th><th>Produzido</th><th>Descartes</th><th>Líquido</th></tr></thead>
+<tbody id="tabelaDiaria"></tbody>
+</table>
+
+<div class="total">Total líquido: <span id="totalLiquido">0</span></div>
+<button class="action" onclick="salvarDiaria()">Salvar</button>
+</div>
+</div>
+
+<div id="semanal" class="hidden">
+<div class="box">
+<h2>Produção Semanal</h2>
+<label>Data <input type="date" id="dataSemanal"></label>
+<label>Fornos <input type="number" id="qtdFornos" value="0"></label>
+
+<table>
+<thead><tr><th>Tipo</th><th>Qtd</th><th>Fator</th><th>Equiv.</th></tr></thead>
+<tbody id="tabelaSemanal"></tbody>
+</table>
+
+<div class="total">Total equivalente: <span id="totalEq">0</span></div>
+<button class="action" onclick="salvarSemanal()">Salvar</button>
+</div>
+</div>
+
+<div id="estoque" class="hidden">
+<div class="box">
+<h2>Estoque</h2>
+<table>
+<thead><tr><th>Tipo</th><th>Qtd</th></tr></thead>
+<tbody id="tabelaEstoque"></tbody>
+</table>
+</div>
+</div>
+
+<div id="graficos" class="hidden">
+<div style="margin-bottom:15px">
+ <button onclick="filtrarGrafico('dia')">📅 Diário</button>
+ <button onclick="filtrarGrafico('mes')">🗓️ Mensal</button>
+ <button onclick="filtrarGrafico('ano')">📆 Anual</button>
+</div>
+<canvas id="grafico"></canvas>
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast">Salvo com sucesso</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
