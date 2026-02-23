@@ -150,3 +150,80 @@ button.action:hover{
  transform:translateY(-3px);
  box-shadow:0 8px 18px rgba(0,0,0,.25);
 }
+/* ================= RESPONSIVO CELULAR ================= */
+
+@media (max-width: 768px) {
+
+body {
+    font-size: 16px;
+}
+
+.container {
+    flex-direction: column;
+    padding: 10px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.menu button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.content {
+    width: 100%;
+}
+
+.box {
+    padding: 15px;
+}
+
+table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.topo {
+    text-align: center;
+    font-size: 18px;
+}
+
+.start {
+    padding: 20px;
+    text-align: center;
+}
+
+.logo-start {
+    max-width: 150px;
+}
+
+}

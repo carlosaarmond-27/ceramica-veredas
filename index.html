@@ -2,10 +2,12 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerâmica Veredas | Gestão</title>
 
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -34,6 +36,7 @@
 
 <div class="content">
 
+<!-- PAINEL -->
 <div id="painel">
 <div class="box">
  <h2>Relatório Geral</h2>
@@ -45,10 +48,12 @@
 </div>
 </div>
 
+<!-- DIÁRIA -->
 <div id="diaria" class="hidden">
 <div class="box">
 <h2>Produção Diária</h2>
 <label>Data <input type="date" id="dataDiaria"></label>
+<label>Horas Paradas <input type="number" id="horasParadas" value="0"></label>
 
 <table>
 <thead><tr><th>Tipo</th><th>Produzido</th><th>Descartes</th><th>Líquido</th></tr></thead>
@@ -60,6 +65,7 @@
 </div>
 </div>
 
+<!-- SEMANAL -->
 <div id="semanal" class="hidden">
 <div class="box">
 <h2>Produção Semanal</h2>
@@ -76,16 +82,25 @@
 </div>
 </div>
 
+<!-- ESTOQUE -->
 <div id="estoque" class="hidden">
 <div class="box">
 <h2>Estoque</h2>
+
+<h3>Registrar Saída</h3>
+<input type="text" id="tipoSaida" placeholder="Tipo do Tijolo">
+<input type="number" id="quantidadeSaida" placeholder="Quantidade">
+<button onclick="registrarSaida()">Registrar Saída</button>
+
 <table>
 <thead><tr><th>Tipo</th><th>Qtd</th></tr></thead>
 <tbody id="tabelaEstoque"></tbody>
 </table>
+
 </div>
 </div>
 
+<!-- GRÁFICOS -->
 <div id="graficos" class="hidden">
 <div style="margin-bottom:15px">
  <button onclick="filtrarGrafico('dia')">📅 Diário</button>
