@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
 // ================= TIPOS =================
 
@@ -11,35 +11,29 @@ const tipos=[
  {n:"14x19x25",f:1.54}
 ];
 
-// ================= BANCO LOCAL =================
-
-let diariaDB=JSON.parse(localStorage.getItem("diaria"))||[];
-let semanalDB=JSON.parse(localStorage.getItem("semanal"))||[];
-let estoqueDB=JSON.parse(localStorage.getItem("estoque"))||{};
-tipos.forEach(t=>estoqueDB[t.n]??=0);
-
-// ================= ELEMENTOS =================
-
-const tabelaDiaria=document.getElementById("tabelaDiaria");
-const tabelaSemanal=document.getElementById("tabelaSemanal");
-const tabelaEstoque=document.getElementById("tabelaEstoque");
-
-const dataDiaria=document.getElementById("dataDiaria");
-const dataSemanal=document.getElementById("dataSemanal");
-const qtdFornos=document.getElementById("qtdFornos");
-const totalLiquido=document.getElementById("totalLiquido");
+let diariaDB=[];
+let semanalDB=[];
 
 // ================= SUPABASE =================
 
 const SUPABASE_URL = "https://ctjlmweuplsgkgbgmoad.supabase.co";
-const SUPABASE_KEY = "sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2";
+const SUPABASE_KEY = "SUA_PUBLIC_KEY_AQUI";
 
 const supabase = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
-// ================= TABELAS =================
+// ================= ELEMENTOS =================
+
+const tabelaDiaria=document.getElementById("tabelaDiaria");
+const tabelaSemanal=document.getElementById("tabelaSemanal");
+const dataDiaria=document.getElementById("dataDiaria");
+const dataSemanal=document.getElementById("dataSemanal");
+const qtdFornos=document.getElementById("qtdFornos");
+const totalLiquido=document.getElementById("totalLiquido");
+
+// ================= CRIAR TABELAS =================
 
 tipos.forEach(t=>{
  if(tabelaDiaria){
@@ -63,6 +57,21 @@ tipos.forEach(t=>{
  }
 });
 
+// ================= CARREGAR BANCO =================
+
+async function carregarDados(){
+
+ const { data: diaria } = await supabase.from("producao_diaria").select("*");
+ const { data: semanal } = await supabase.from("producao_semanal").select("*");
+
+ diariaDB = diaria || [];
+ semanalDB = semanal || [];
+
+ atualizarPainel();
+}
+
+await carregarDados();
+
 // ================= DIARIA =================
 
 if(tabelaDiaria){
@@ -79,18 +88,25 @@ if(tabelaDiaria){
  };
 }
 
-window.salvarDiaria=function(){
+window.salvarDiaria=async function(){
 
  const horasParadas=+document.getElementById("horasParadas")?.value||0;
 
- diariaDB.push({
-  d:dataDiaria.value,
-  total:+totalLiquido.innerText,
-  horasParadas:horasParadas
- });
+ const { error } = await supabase
+  .from("producao_diaria")
+  .insert([{
+    data:dataDiaria.value,
+    total:+totalLiquido.innerText,
+    horas_paradas:horasParadas
+  }]);
 
- localStorage.setItem("diaria",JSON.stringify(diariaDB));
- atualizarPainel();
+ if(error){
+  alert("Erro ao salvar diária");
+  console.log(error);
+  return;
+ }
+
+ await carregarDados();
  toastMsg();
 }
 
@@ -109,50 +125,30 @@ if(tabelaSemanal){
  };
 }
 
-window.salvarSemanal=function(){
+window.salvarSemanal=async function(){
+
  let total=0;
 
  document.querySelectorAll("#tabelaSemanal tr").forEach((r,i)=>{
   const q=+r.querySelector(".qtd")?.value||0;
-  estoqueDB[tipos[i].n]+=q;
   total+=q*tipos[i].f;
  });
 
- semanalDB.push({
-  d:dataSemanal.value,
-  total:Math.round(total),
-  fornos:+qtdFornos.value||0
- });
+ const { error } = await supabase
+  .from("producao_semanal")
+  .insert([{
+    data:dataSemanal.value,
+    total:Math.round(total),
+    fornos:+qtdFornos.value||0
+  }]);
 
- localStorage.setItem("semanal",JSON.stringify(semanalDB));
- localStorage.setItem("estoque",JSON.stringify(estoqueDB));
-
- atualizarPainel();
- atualizarEstoque();
- toastMsg();
-}
-
-// ================= SAÍDA DE ESTOQUE =================
-
-window.registrarSaida=function(){
-
- const tipo=document.getElementById("tipoSaida")?.value;
- const qtd=+document.getElementById("quantidadeSaida")?.value||0;
-
- if(!estoqueDB[tipo]){
-  alert("Tipo não encontrado!");
+ if(error){
+  alert("Erro ao salvar semanal");
+  console.log(error);
   return;
  }
 
- if(estoqueDB[tipo]<qtd){
-  alert("Estoque insuficiente!");
-  return;
- }
-
- estoqueDB[tipo]-=qtd;
-
- localStorage.setItem("estoque",JSON.stringify(estoqueDB));
- atualizarEstoque();
+ await carregarDados();
  toastMsg();
 }
 
@@ -167,80 +163,6 @@ function atualizarPainel(){
  document.getElementById("totalSemanal").innerText=totalSemanal;
  document.getElementById("totalFornos").innerText=tf;
  document.getElementById("eficienciaForno").innerText=tf?(totalSemanal/tf).toFixed(2):0;
-}
-
-// ================= ESTOQUE =================
-
-function atualizarEstoque(){
- if(!tabelaEstoque) return;
- tabelaEstoque.innerHTML="";
- Object.entries(estoqueDB).forEach(([k,v])=>{
-  tabelaEstoque.innerHTML+=`<tr><td>${k}</td><td>${v}</td></tr>`;
- });
-}
-
-// ================= EXPORTAR EXCEL =================
-
-window.exportarExcel=function(){
- const ws = XLSX.utils.json_to_sheet(diariaDB);
- const wb = XLSX.utils.book_new();
- XLSX.utils.book_append_sheet(wb, ws, "Diaria");
- XLSX.writeFile(wb, "relatorio_diario.xlsx");
-}
-
-// ================= TROCA DE TELAS =================
-
-document.querySelectorAll(".menu button").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  document.querySelectorAll(".content > div").forEach(tela=>{
-   tela.classList.add("hidden");
-  });
-  document.getElementById(btn.getAttribute("data-tela")).classList.remove("hidden");
- });
-});
-
-// ================= GRÁFICO =================
-
-let grafico;
-
-window.filtrarGrafico=function(tipo){
-
- const ctx=document.getElementById("grafico");
-
- let labels=[];
- let dados=[];
-
- if(tipo==="dia"){
-  labels=diariaDB.map(r=>r.d);
-  dados=diariaDB.map(r=>r.total);
- }
-
- if(tipo==="mes"||tipo==="ano"){
-  labels=semanalDB.map(r=>r.d);
-  dados=semanalDB.map(r=>r.total);
- }
-
- if(grafico) grafico.destroy();
-
- grafico=new Chart(ctx,{
-  type:"bar",
-  data:{
-   labels:labels,
-   datasets:[{
-    label:"Produção",
-    data:dados
-   }]
-  }
- });
-}
-
-// ================= ENTRAR =================
-
-window.entrar=function(){
- document.getElementById("start").style.display="none";
- document.getElementById("sistema").classList.remove("hidden");
- atualizarPainel();
- atualizarEstoque();
 }
 
 // ================= TOAST =================
