@@ -17,7 +17,7 @@ let semanalDB=[];
 // ================= SUPABASE =================
 
 const SUPABASE_URL = "https://ctjlmweuplsgkgbgmoad.supabase.co";
-const SUPABASE_KEY = "SUA_PUBLIC_KEY_AQUI";
+const SUPABASE_KEY = "sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2";
 
 const supabase = window.supabase.createClient(
   SUPABASE_URL,
@@ -175,3 +175,8 @@ function toastMsg(){
 }
 
 });
+
+window.entrar = function () {
+  document.getElementById("start").style.display = "none";
+  document.getElementById("sistema").classList.remove("hidden");
+};
