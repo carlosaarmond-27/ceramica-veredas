@@ -95,17 +95,42 @@ if(tabelaEstoque){
 
 async function carregarDados(){
 
- const { data: diaria } = await supabase.from("producao_diaria").select("*");
- const { data: semanal } = await supabase.from("producao_semanal").select("*");
+ const { data: diaria } = await supabase
+  .from("producao_diaria")
+  .select("*");
+
+ const { data: semanal } = await supabase
+  .from("producao_semanal")
+  .select("*");
 
  diariaDB = diaria || [];
  semanalDB = semanal || [];
 
  atualizarPainel();
+ preencherTabelaSemanal();
 }
 
-await carregarDados();
+function preencherTabelaSemanal(){
 
+ if(!tabelaSemanal) return;
+
+ document.querySelectorAll("#tabelaSemanal .qtd").forEach(input=>{
+  input.value = 0;
+ });
+
+ semanalDB.forEach(reg => {
+
+  const index = tipos.findIndex(t => t.n === reg.tipo);
+
+  if(index !== -1){
+   const linha = document.querySelectorAll("#tabelaSemanal tr")[index];
+   const input = linha.querySelector(".qtd");
+   input.value = reg.quantidade;
+  }
+
+ });
+
+}
 // ================= DIARIA =================
 
 if(tabelaDiaria){
@@ -182,16 +207,22 @@ window.salvarSemanal = async function(){
 // ================= PAINEL =================
 
 function atualizarPainel(){
- const totalDiario=diariaDB.reduce((s,r)=>s+r.total,0);
- const totalSemanal=semanalDB.reduce((s,r)=>s+r.total,0);
- const tf=semanalDB.reduce((s,r)=>s+(r.fornos||0),0);
 
- document.getElementById("totalDiario").innerText=totalDiario;
- document.getElementById("totalSemanal").innerText=totalSemanal;
- document.getElementById("totalFornos").innerText=tf;
- document.getElementById("eficienciaForno").innerText=tf?(totalSemanal/tf).toFixed(2):0;
+ const totalDiario = diariaDB.reduce((s,r)=>s+(r.total||0),0);
+
+ const totalSemanal = semanalDB.reduce((s,r)=>{
+  return s + ((r.quantidade||0) * (r.fator||0));
+ },0);
+
+ const tf = semanalDB.reduce((s,r)=>s+(r.fornos||0),0);
+
+ document.getElementById("totalDiario").innerText = totalDiario;
+ document.getElementById("totalSemanal").innerText = Math.round(totalSemanal);
+ document.getElementById("totalFornos").innerText = tf;
+
+ document.getElementById("eficienciaForno").innerText =
+  tf ? (totalSemanal/tf).toFixed(2) : 0;
 }
-
 // ================= TOAST =================
 
 function toastMsg(){
@@ -207,3 +238,44 @@ window.entrar = function () {
   document.getElementById("start").style.display = "none";
   document.getElementById("sistema").classList.remove("hidden");
 };
+
+window.exportarExcel = function(){
+
+ const wb = XLSX.utils.book_new();
+ const ws = XLSX.utils.json_to_sheet(semanalDB);
+ XLSX.utils.book_append_sheet(wb, ws, "Semanal");
+
+ XLSX.writeFile(wb, "relatorio.xlsx");
+}
+
+window.registrarSaida = function(){
+
+ const tipo = document.getElementById("tipoSaida").value;
+ const qtd = +document.getElementById("quantidadeSaida").value || 0;
+
+ if(!tipo || qtd<=0){
+  alert("Preencha corretamente");
+  return;
+ }
+
+ alert("Saída registrada (modo simples)");
+
+}
+window.filtrarGrafico = function(){
+
+ const ctx = document.getElementById("grafico");
+
+ if(!ctx) return;
+
+ new Chart(ctx,{
+  type:"bar",
+  data:{
+   labels: semanalDB.map(r=>r.tipo),
+   datasets:[{
+    label:"Quantidade",
+    data: semanalDB.map(r=>r.quantidade)
+   }]
+  }
+ });
+
+}
