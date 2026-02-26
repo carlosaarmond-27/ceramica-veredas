@@ -147,13 +147,14 @@ window.salvarDiaria=async function(){
 // ================= SEMANAL =================
 window.salvarSemanal = async function(){
 
- const dataSelecionada = dataSemanal.value;
- const fornosValor = +qtdFornos.value || 0;
+ const dataSelecionada = document.getElementById("dataSemanal").value;
+ const fornosValor = +document.getElementById("qtdFornos").value || 0;
 
- for(let i=0; i<tipos.length; i++){
+ const linhas = document.querySelectorAll("#tabelaSemanal tr");
 
-  const linha = document.querySelectorAll("#tabelaSemanal tr")[i];
-  const quantidade = +linha.querySelector(".qtd")?.value || 0;
+ for(let i=0; i<linhas.length; i++){
+
+  const quantidade = +linhas[i].querySelector(".qtd")?.value || 0;
 
   if(quantidade > 0){
 
@@ -172,7 +173,6 @@ window.salvarSemanal = async function(){
     alert("Erro ao salvar semanal");
     return;
    }
-
   }
  }
 
