@@ -76,6 +76,21 @@ tipos.forEach(t=>{
  }
 });
 
+// ================= ESTOQUE =================
+
+const tabelaEstoque=document.getElementById("tabelaEstoque");
+
+if(tabelaEstoque){
+ tipos.forEach(t=>{
+  tabelaEstoque.innerHTML+=`
+   <tr>
+    <td>${t.n}</td>
+    <td id="estoque-${t.n}">0</td>
+   </tr>
+  `;
+ });
+}
+
 // ================= CARREGAR BANCO =================
 
 async function carregarDados(){
@@ -130,47 +145,40 @@ window.salvarDiaria=async function(){
 }
 
 // ================= SEMANAL =================
+window.salvarSemanal = async function(){
 
-if(tabelaSemanal){
- tabelaSemanal.oninput=()=>{
-  let t=0;
-  document.querySelectorAll("#tabelaSemanal tr").forEach((r,i)=>{
-   const q=+r.querySelector(".qtd")?.value||0;
-   const e=q*tipos[i].f;
-   r.querySelector(".eq").innerText=e.toFixed(2);
-   t+=e;
-  });
-  document.getElementById("totalEq").innerText=Math.round(t);
- };
-}
+ const dataSelecionada = dataSemanal.value;
+ const fornosValor = +qtdFornos.value || 0;
 
-window.salvarSemanal=async function(){
+ for(let i=0; i<tipos.length; i++){
 
- let total=0;
+  const linha = document.querySelectorAll("#tabelaSemanal tr")[i];
+  const quantidade = +linha.querySelector(".qtd")?.value || 0;
 
- document.querySelectorAll("#tabelaSemanal tr").forEach((r,i)=>{
-  const q=+r.querySelector(".qtd")?.value||0;
-  total+=q*tipos[i].f;
- });
+  if(quantidade > 0){
 
- const { error } = await supabase
-  .from("producao_semanal")
-  .insert([{
-    data:dataSemanal.value,
-    total:Math.round(total),
-    fornos:+qtdFornos.value||0
-  }]);
+   const { error } = await supabase
+    .from("producao_semanal")
+    .insert([{
+      data: dataSelecionada,
+      tipo: tipos[i].n,
+      quantidade: quantidade,
+      fator: tipos[i].f,
+      fornos: fornosValor
+    }]);
 
- if(error){
-  alert("Erro ao salvar semanal");
-  console.log(error);
-  return;
+   if(error){
+    console.log(error);
+    alert("Erro ao salvar semanal");
+    return;
+   }
+
+  }
  }
 
  await carregarDados();
  toastMsg();
 }
-
 // ================= PAINEL =================
 
 function atualizarPainel(){
