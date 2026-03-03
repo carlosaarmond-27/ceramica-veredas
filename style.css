@@ -12,190 +12,113 @@ body{
  margin:0;
  font-family:Arial,sans-serif;
  background:var(--cinza);
- overflow:hidden;
 }
 
-.hidden{display:none}
-
-/* TELA INICIAL */
-.start{
- position:fixed;
- inset:0;
+/* TÍTULO */
+h1{
  background:linear-gradient(135deg,var(--verde),var(--verde3));
- display:flex;
- flex-direction:column;
- justify-content:center;
- align-items:center;
  color:#fff;
- text-align:center;
- z-index:999;
-}
-
-.logo-start{
- width:240px;
- max-width:70%;
- margin-bottom:25px;
- filter:drop-shadow(0 10px 20px rgba(0,0,0,.35));
-}
-
-.start button{
- padding:14px 40px;
- border:none;
- border-radius:30px;
- background:var(--laranja);
- color:#fff;
- font-size:16px;
- font-weight:bold;
- cursor:pointer;
- transition:.25s;
-}
-
-.start button:hover{
- transform:translateY(-2px);
- box-shadow:0 6px 14px rgba(0,0,0,.3);
-}
-
-/* SISTEMA */
-.topo{
- background:var(--verde);
- color:#fff;
- padding:15px;
+ margin:0;
+ padding:20px;
  text-align:center;
  font-size:22px;
 }
 
-.container{display:flex;height:calc(100vh - 56px)}
-
-.menu{
- width:220px;
- background:var(--verde);
- padding:15px;
-}
-
-.menu button{
- width:100%;
- margin-bottom:10px;
- padding:12px;
- border:none;
- border-radius:8px;
- background:var(--verde2);
- color:#fff;
- cursor:pointer;
- transition:.2s;
-}
-
-.menu button:hover{background:var(--laranja)}
-
-.content{flex:1;padding:20px;overflow:auto}
-
+/* CAIXAS */
 .box{
  background:#fff;
- padding:20px;
- border-radius:14px;
+ padding:25px;
+ margin:25px auto;
+ border-radius:18px;
  max-width:1100px;
+ box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
-table{width:100%;border-collapse:collapse;margin-top:15px}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
-th{background:#eee}
-
-.total{
- font-size:22px;
- color:var(--laranja);
- margin-top:15px;
- font-weight:bold;
+/* TÍTULOS INTERNOS */
+.box h2{
+ margin-top:0;
+ color:var(--verde);
 }
 
-button.action{
- margin-top:20px;
+/* INPUTS */
+input{
+ padding:10px;
+ border-radius:8px;
+ border:1px solid #ccc;
+ width:200px;
+ margin-top:5px;
+}
+
+/* BOTÕES PADRÃO */
+button{
  padding:10px 24px;
  border:none;
- border-radius:8px;
+ border-radius:10px;
  background:var(--verde);
  color:#fff;
- cursor:pointer;
- transition:.2s;
-}
-
-button.action:hover{
- background:var(--laranja);
-}
-
-.toast{
- position:fixed;
- bottom:20px;
- right:20px;
- background:var(--verde);
- color:#fff;
- padding:12px 20px;
- border-radius:8px;
- display:none;
-}
-
-/* BOTÕES GRÁFICO */
-#graficos button{
- background:var(--verde);
- color:#fff;
- border:none;
- padding:16px 36px;
- border-radius:12px;
- font-size:17px;
  font-weight:bold;
  cursor:pointer;
  transition:.25s;
 }
 
-#graficos button:hover{
+button:hover{
  background:var(--laranja);
- transform:translateY(-3px);
- box-shadow:0 8px 18px rgba(0,0,0,.25);
-}
-/* ================= MOBILE APP STYLE ================= */
-
-@media (max-width: 768px) {
-
-.container {
-    flex-direction: column;
+ transform:translateY(-2px);
+ box-shadow:0 6px 14px rgba(0,0,0,.2);
 }
 
-.menu {
-    width: 100%;
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding: 10px;
-    background: #0f5f2f;
+/* TABELA */
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px;
 }
 
-.menu button {
-    flex: 0 0 auto;
-    padding: 8px 14px;
-    font-size: 14px;
-    border-radius: 20px;
-    white-space: nowrap;
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center;
 }
 
-.content {
-    width: 100%;
-    padding: 10px;
+th{
+ background:#eee;
+ font-weight:bold;
 }
 
-.box {
-    width: 100%;
-    padding: 18px;
-    border-radius: 18px;
+/* ESTOQUE */
+#estoqueAtual{
+ color:var(--laranja);
+ font-size:22px;
 }
 
-.topo {
-    font-size: 18px;
-    padding: 12px;
+/* GRÁFICO */
+canvas{
+ margin-top:20px;
 }
 
-button.action {
-    width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    border-radius: 12px;
+/* ================= MOBILE ================= */
+
+@media (max-width:768px){
+
+.box{
+    margin:15px;
+    padding:18px;
+    border-radius:20px;
+}
+
+input{
+    width:100%;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+}
+
+h1{
+    font-size:18px;
+    padding:15px;
 }
 
 }
