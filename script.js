@@ -1,281 +1,216 @@
-document.addEventListener("DOMContentLoaded", async function () {
+// ===============================
+// CONFIG SUPABASE
+// ===============================
+const supabaseUrl = 'https://ctjlmweuplsgkgbgmoad.supabase.co';
+const supabaseKey = 'sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ================= NAVEGAÇÃO MENU =================
+// ===============================
+// PRODUÇÃO - SOMAR POR DATA
+// ===============================
+async function salvarProducao() {
 
-document.querySelectorAll(".menu button").forEach(btn=>{
- btn.addEventListener("click",function(){
+  const data = document.getElementById("data").value;
+  const total = parseInt(document.getElementById("total").value);
+  const fornos = parseInt(document.getElementById("fornos").value);
 
-  const tela=this.getAttribute("data-tela");
-
-  document.querySelectorAll(".content > div").forEach(div=>{
-   div.classList.add("hidden");
-  });
-
-  const alvo=document.getElementById(tela);
-  if(alvo){
-   alvo.classList.remove("hidden");
-  }
-
- });
-});
-
-// ================= TIPOS =================
-
-const tipos=[
- {n:"09x19x19",f:0.75},
- {n:"09x19x25",f:0.99},
- {n:"11,5x19x19",f:0.96},
- {n:"11,5x19x25",f:1.26},
- {n:"14x19x19",f:1.17},
- {n:"14x19x25",f:1.54}
-];
-
-let diariaDB=[];
-let semanalDB=[];
-
-// ================= SUPABASE =================
-
-const SUPABASE_URL = "https://ctjlmweuplsgkgbgmoad.supabase.co";
-const SUPABASE_KEY = "sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2";
-
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-// ================= ELEMENTOS =================
-
-const tabelaDiaria=document.getElementById("tabelaDiaria");
-const tabelaSemanal=document.getElementById("tabelaSemanal");
-const dataDiaria=document.getElementById("dataDiaria");
-const dataSemanal=document.getElementById("dataSemanal");
-const qtdFornos=document.getElementById("qtdFornos");
-const totalLiquido=document.getElementById("totalLiquido");
-
-// ================= CRIAR TABELAS =================
-
-tipos.forEach(t=>{
- if(tabelaDiaria){
-  tabelaDiaria.innerHTML+=`
-  <tr>
-   <td>${t.n}</td>
-   <td><input class="prod" type="number"></td>
-   <td><input class="desc" type="number"></td>
-   <td class="liq">0</td>
-  </tr>`;
- }
-
- if(tabelaSemanal){
-  tabelaSemanal.innerHTML+=`
-  <tr>
-   <td>${t.n}</td>
-   <td><input class="qtd" type="number"></td>
-   <td>${t.f}</td>
-   <td class="eq">0</td>
-  </tr>`;
- }
-});
-
-// ================= ESTOQUE =================
-
-const tabelaEstoque=document.getElementById("tabelaEstoque");
-
-if(tabelaEstoque){
- tipos.forEach(t=>{
-  tabelaEstoque.innerHTML+=`
-   <tr>
-    <td>${t.n}</td>
-    <td id="estoque-${t.n}">0</td>
-   </tr>
-  `;
- });
-}
-
-// ================= CARREGAR BANCO =================
-
-async function carregarDados(){
-
- const { data: diaria } = await supabase
-  .from("producao_diaria")
-  .select("*");
-
- const { data: semanal } = await supabase
-  .from("producao_semanal")
-  .select("*");
-
- diariaDB = diaria || [];
- semanalDB = semanal || [];
-
- atualizarPainel();
- preencherTabelaSemanal();
-}
-
-function preencherTabelaSemanal(){
-
- if(!tabelaSemanal) return;
-
- document.querySelectorAll("#tabelaSemanal .qtd").forEach(input=>{
-  input.value = 0;
- });
-
- semanalDB.forEach(reg => {
-
-  const index = tipos.findIndex(t => t.n === reg.tipo);
-
-  if(index !== -1){
-   const linha = document.querySelectorAll("#tabelaSemanal tr")[index];
-   const input = linha.querySelector(".qtd");
-   input.value = reg.quantidade;
-  }
-
- });
-
-}
-// ================= DIARIA =================
-
-if(tabelaDiaria){
- tabelaDiaria.oninput=()=>{
-  let t=0;
-  document.querySelectorAll("#tabelaDiaria tr").forEach(r=>{
-   const p=+r.querySelector(".prod")?.value||0;
-   const d=+r.querySelector(".desc")?.value||0;
-   const l=Math.max(p-d,0);
-   r.querySelector(".liq").innerText=l;
-   t+=l;
-  });
-  totalLiquido.innerText=t;
- };
-}
-
-window.salvarDiaria=async function(){
-
- const horasParadas=+document.getElementById("horasParadas")?.value||0;
-
- const { error } = await supabase
-  .from("producao_diaria")
-  .insert([{
-    data:dataDiaria.value,
-    total:+totalLiquido.innerText,
-    horas_paradas:horasParadas
-  }]);
-
- if(error){
-  alert("Erro ao salvar diária");
-  console.log(error);
-  return;
- }
-
- await carregarDados();
- toastMsg();
-}
-
-// ================= SEMANAL =================
-window.salvarSemanal = async function(){
-
- const dataSelecionada = document.getElementById("dataSemanal").value;
- const fornosValor = +document.getElementById("qtdFornos").value || 0;
-
- const linhas = document.querySelectorAll("#tabelaSemanal tr");
-
- for(let i=0; i<linhas.length; i++){
-
-  const quantidade = +linhas[i].querySelector(".qtd")?.value || 0;
-
-  if(quantidade > 0){
-
-   const { error } = await supabase
-    .from("producao_semanal")
-    .insert([{
-      data: dataSelecionada,
-      tipo: tipos[i].n,
-      quantidade: quantidade,
-      fator: tipos[i].f,
-      fornos: fornosValor
-    }]);
-
-   if(error){
-    console.log(error);
-    alert("Erro ao salvar semanal");
+  if (!data || !total || !fornos) {
+    alert("Preencha todos os campos.");
     return;
-   }
   }
- }
 
- await carregarDados();
- toastMsg();
-}
-// ================= PAINEL =================
+  // Verifica se já existe produção na data
+  const { data: existente } = await supabase
+    .from('producao_semanal')
+    .select('*')
+    .eq('data', data);
 
-function atualizarPainel(){
+  if (existente.length > 0) {
+    // Soma os valores
+    const novoTotal = existente[0].total + total;
+    const novosFornos = existente[0].fornos + fornos;
 
- const totalDiario = diariaDB.reduce((s,r)=>s+(r.total||0),0);
+    await supabase
+      .from('producao_semanal')
+      .update({
+        total: novoTotal,
+        fornos: novosFornos
+      })
+      .eq('data', data);
 
- const totalSemanal = semanalDB.reduce((s,r)=>{
-  return s + ((r.quantidade||0) * (r.fator||0));
- },0);
-
- const tf = semanalDB.reduce((s,r)=>s+(r.fornos||0),0);
-
- document.getElementById("totalDiario").innerText = totalDiario;
- document.getElementById("totalSemanal").innerText = Math.round(totalSemanal);
- document.getElementById("totalFornos").innerText = tf;
-
- document.getElementById("eficienciaForno").innerText =
-  tf ? (totalSemanal/tf).toFixed(2) : 0;
-}
-// ================= TOAST =================
-
-function toastMsg(){
- const t=document.getElementById("toast");
- if(!t) return;
- t.style.display="block";
- setTimeout(()=>t.style.display="none",2000);
-}
-
-});
-
-window.entrar = function () {
-  document.getElementById("start").style.display = "none";
-  document.getElementById("sistema").classList.remove("hidden");
-};
-
-window.exportarExcel = function(){
-
- const wb = XLSX.utils.book_new();
- const ws = XLSX.utils.json_to_sheet(semanalDB);
- XLSX.utils.book_append_sheet(wb, ws, "Semanal");
-
- XLSX.writeFile(wb, "relatorio.xlsx");
-}
-
-window.registrarSaida = function(){
-
- const tipo = document.getElementById("tipoSaida").value;
- const qtd = +document.getElementById("quantidadeSaida").value || 0;
-
- if(!tipo || qtd<=0){
-  alert("Preencha corretamente");
-  return;
- }
-
- alert("Saída registrada (modo simples)");
-
-}
-window.filtrarGrafico = function(){
-
- const ctx = document.getElementById("grafico");
-
- if(!ctx) return;
-
- new Chart(ctx,{
-  type:"bar",
-  data:{
-   labels: semanalDB.map(r=>r.tipo),
-   datasets:[{
-    label:"Quantidade",
-    data: semanalDB.map(r=>r.quantidade)
-   }]
+  } else {
+    await supabase
+      .from('producao_semanal')
+      .insert([{ data, total, fornos }]);
   }
- });
 
+  // Atualiza estoque automaticamente
+  await entradaEstoque(total);
+
+  carregarProducao();
+  carregarEstoque();
+
+  alert("Produção salva com sucesso!");
 }
+
+// ===============================
+// ESTOQUE
+// ===============================
+
+async function entradaEstoque(qtd) {
+
+  const { data } = await supabase
+    .from('estoque')
+    .select('*')
+    .limit(1);
+
+  if (data.length === 0) {
+    await supabase
+      .from('estoque')
+      .insert([{ quantidade: qtd }]);
+  } else {
+    const novaQtd = data[0].quantidade + qtd;
+
+    await supabase
+      .from('estoque')
+      .update({
+        quantidade: novaQtd,
+        updated_at: new Date()
+      })
+      .eq('id', data[0].id);
+  }
+
+  await supabase
+    .from('movimentacao_estoque')
+    .insert([{ tipo: "entrada", quantidade: qtd, data: new Date() }]);
+}
+
+async function registrarSaida() {
+
+  const qtd = parseInt(prompt("Quantidade de saída:"));
+
+  if (!qtd || qtd <= 0) return;
+
+  const { data } = await supabase
+    .from('estoque')
+    .select('*')
+    .limit(1);
+
+  if (data[0].quantidade < qtd) {
+    alert("Estoque insuficiente!");
+    return;
+  }
+
+  const novaQtd = data[0].quantidade - qtd;
+
+  await supabase
+    .from('estoque')
+    .update({ quantidade: novaQtd })
+    .eq('id', data[0].id);
+
+  await supabase
+    .from('movimentacao_estoque')
+    .insert([{ tipo: "saida", quantidade: qtd, data: new Date() }]);
+
+  carregarEstoque();
+}
+
+// ===============================
+// CARREGAR DADOS
+// ===============================
+
+async function carregarProducao() {
+
+  const { data } = await supabase
+    .from('producao_semanal')
+    .select('*')
+    .order('data', { ascending: true });
+
+  const tabela = document.getElementById("tabelaProducao");
+  tabela.innerHTML = "";
+
+  data.forEach(item => {
+    tabela.innerHTML += `
+      <tr>
+        <td>${item.data}</td>
+        <td>${item.total}</td>
+        <td>${item.fornos}</td>
+      </tr>
+    `;
+  });
+}
+
+async function carregarEstoque() {
+
+  const { data } = await supabase
+    .from('estoque')
+    .select('*')
+    .limit(1);
+
+  if (data.length > 0) {
+    document.getElementById("estoqueAtual").innerText = data[0].quantidade;
+  }
+}
+
+// ===============================
+// EXPORTAR EXCEL
+// ===============================
+
+async function exportarExcel() {
+
+  const { data } = await supabase
+    .from('producao_semanal')
+    .select('*');
+
+  let csv = "Data,Total,Fornos\n";
+
+  data.forEach(linha => {
+    csv += `${linha.data},${linha.total},${linha.fornos}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "producao.csv";
+  a.click();
+}
+
+// ===============================
+// GRÁFICO
+// ===============================
+
+let grafico;
+
+async function gerarGrafico() {
+
+  const { data } = await supabase
+    .from('producao_semanal')
+    .select('*')
+    .order('data', { ascending: true });
+
+  const labels = data.map(item => item.data);
+  const valores = data.map(item => item.total);
+
+  const ctx = document.getElementById('grafico').getContext('2d');
+
+  if (grafico) grafico.destroy();
+
+  grafico = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Produção',
+        data: valores
+      }]
+    }
+  });
+}
+
+// ===============================
+// INICIALIZAÇÃO
+// ===============================
+carregarProducao();
+carregarEstoque();

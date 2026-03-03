@@ -3,121 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cerâmica Veredas | Gestão</title>
+<title>Cerâmica Veredas | Gestão 2.0</title>
 
-<link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<meta name="theme-color" content="#2f6d3c">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.js"></script>
+
+<style>
+body { font-family: Arial; padding:20px; }
+.box { margin-bottom:30px; padding:20px; border:1px solid #ccc; border-radius:8px; }
+button { padding:8px 15px; cursor:pointer; }
+table { width:100%; margin-top:10px; border-collapse: collapse; }
+th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+</style>
 </head>
 
 <body>
 
-<!-- TELA INICIAL -->
-<div class="start" id="start">
- <img src="assets/logo.png" class="logo-start" alt="Cerâmica Veredas">
- <h1>Cerâmica Veredas</h1>
- <p>Gestão inteligente para produção cerâmica</p>
- <button onclick="entrar()">Iniciar</button>
-</div>
+<h1>Cerâmica Veredas - Sistema 2.0</h1>
 
-<div id="sistema" class="hidden">
-
-<div class="topo">Cerâmica Veredas</div>
-
-<div class="container">
-
-<div class="menu">
- <button data-tela="painel">Relatório</button>
- <button data-tela="diaria">Produção Diária</button>
- <button data-tela="semanal">Produção Semanal</button>
- <button data-tela="estoque">Estoque</button>
- <button data-tela="graficos">Gráficos</button>
-</div>
-
-<div class="content">
-
-<!-- PAINEL -->
-<div id="painel">
+<!-- PRODUÇÃO -->
 <div class="box">
- <h2>Relatório Geral</h2>
- <p>Total Diário: <b id="totalDiario">0</b></p>
- <p>Total Semanal: <b id="totalSemanal">0</b></p>
- <p>Total de Fornos: <b id="totalFornos">0</b></p>
- <p>Eficiência por Forno: <b id="eficienciaForno">0</b></p>
- <button class="action" onclick="exportarExcel()">Exportar Excel</button>
-</div>
+<h2>Registrar Produção</h2>
+
+<label>Data:
+<input type="date" id="data">
+</label>
+
+<br><br>
+
+<label>Total Produzido:
+<input type="number" id="total">
+</label>
+
+<br><br>
+
+<label>Fornos:
+<input type="number" id="fornos">
+</label>
+
+<br><br>
+
+<button onclick="salvarProducao()">Salvar Produção</button>
 </div>
 
-<!-- DIÁRIA -->
-<div id="diaria" class="hidden">
+<!-- TABELA PRODUÇÃO -->
 <div class="box">
-<h2>Produção Diária</h2>
-<label>Data <input type="date" id="dataDiaria"></label>
-<label>Horas Paradas <input type="number" id="horasParadas" value="0"></label>
+<h2>Produção Registrada</h2>
 
 <table>
-<thead><tr><th>Tipo</th><th>Produzido</th><th>Descartes</th><th>Líquido</th></tr></thead>
-<tbody id="tabelaDiaria"></tbody>
+<thead>
+<tr>
+<th>Data</th>
+<th>Total</th>
+<th>Fornos</th>
+</tr>
+</thead>
+<tbody id="tabelaProducao"></tbody>
 </table>
 
-<div class="total">Total líquido: <span id="totalLiquido">0</span></div>
-<button class="action" onclick="salvarDiaria()">Salvar</button>
-</div>
-</div>
-
-<!-- SEMANAL -->
-<div id="semanal" class="hidden">
-<div class="box">
-<h2>Produção Semanal</h2>
-<label>Data <input type="date" id="dataSemanal"></label>
-<label>Fornos <input type="number" id="qtdFornos" value="0"></label>
-
-<table>
-<thead><tr><th>Tipo</th><th>Qtd</th><th>Fator</th><th>Equiv.</th></tr></thead>
-<tbody id="tabelaSemanal"></tbody>
-</table>
-
-<div class="total">Total equivalente: <span id="totalEq">0</span></div>
-<button class="action" onclick="salvarSemanal()">Salvar</button>
-</div>
+<br>
+<button onclick="exportarExcel()">Exportar CSV</button>
 </div>
 
 <!-- ESTOQUE -->
-<div id="estoque" class="hidden">
 <div class="box">
-<h2>Estoque</h2>
+<h2>Estoque Atual</h2>
 
-<h3>Registrar Saída</h3>
-<input type="text" id="tipoSaida" placeholder="Tipo do Tijolo">
-<input type="number" id="quantidadeSaida" placeholder="Quantidade">
+<p>Quantidade em Estoque: <b id="estoqueAtual">0</b></p>
+
+<br>
 <button onclick="registrarSaida()">Registrar Saída</button>
-
-<table>
-<thead><tr><th>Tipo</th><th>Qtd</th></tr></thead>
-<tbody id="tabelaEstoque"></tbody>
-</table>
-
-</div>
 </div>
 
-<!-- GRÁFICOS -->
-<div id="graficos" class="hidden">
-<div style="margin-bottom:15px">
- <button onclick="filtrarGrafico('dia')">📅 Diário</button>
- <button onclick="filtrarGrafico('mes')">🗓️ Mensal</button>
- <button onclick="filtrarGrafico('ano')">📆 Anual</button>
-</div>
+<!-- GRÁFICO -->
+<div class="box">
+<h2>Gráfico de Produção</h2>
 <canvas id="grafico"></canvas>
+<br>
+<button onclick="gerarGrafico()">Atualizar Gráfico</button>
 </div>
 
-</div>
-</div>
-</div>
-
-<div class="toast" id="toast">Salvo com sucesso</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.js"></script>
 <script src="script.js"></script>
 
 </body>
