@@ -2,7 +2,7 @@
 // CONFIG SUPABASE
 // ===============================
 const supabaseUrl = 'https://ctjlmweuplsgkgbgmoad.supabase.co';
-const supabaseKey = 'SUA_CHAVE_AQUI';
+const supabaseKey = 'sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ===============================
