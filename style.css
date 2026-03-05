@@ -14,42 +14,119 @@ body{
  background:var(--cinza);
 }
 
-/* TÍTULO */
-h1{
+/* ================= TELA INICIAL ================= */
+
+.start{
+ position:fixed;
+ inset:0;
  background:linear-gradient(135deg,var(--verde),var(--verde3));
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
  color:#fff;
- margin:0;
- padding:20px;
  text-align:center;
- font-size:22px;
+ z-index:999;
 }
 
-/* CAIXAS */
+.start h1{
+ font-size:32px;
+ margin-bottom:30px;
+}
+
+.start button{
+ padding:14px 40px;
+ border:none;
+ border-radius:30px;
+ background:var(--laranja);
+ color:#fff;
+ font-size:16px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:.3s;
+}
+
+.start button:hover{
+ transform:translateY(-3px);
+ box-shadow:0 8px 20px rgba(0,0,0,.3);
+}
+
+/* ================= TOPO ================= */
+
+.topo{
+ background:var(--verde);
+ color:#fff;
+ padding:18px;
+ text-align:center;
+ font-size:20px;
+ font-weight:bold;
+}
+
+/* ================= LAYOUT ================= */
+
+.container{
+ display:flex;
+ height:calc(100vh - 64px);
+}
+
+.menu{
+ width:220px;
+ background:var(--verde);
+ padding:15px;
+ display:flex;
+ flex-direction:column;
+}
+
+.menu button{
+ margin-bottom:10px;
+ padding:12px;
+ border:none;
+ border-radius:8px;
+ background:var(--verde2);
+ color:#fff;
+ cursor:pointer;
+ transition:.2s;
+ font-weight:bold;
+}
+
+.menu button:hover{
+ background:var(--laranja);
+}
+
+.content{
+ flex:1;
+ padding:25px;
+ overflow:auto;
+}
+
+/* ================= CAIXAS ================= */
+
 .box{
  background:#fff;
  padding:25px;
- margin:25px auto;
  border-radius:18px;
  max-width:1100px;
  box-shadow:0 8px 25px rgba(0,0,0,.08);
+ margin-bottom:25px;
 }
 
-/* TÍTULOS INTERNOS */
 .box h2{
  margin-top:0;
  color:var(--verde);
 }
 
-/* INPUTS */
-input{
+/* ================= INPUTS E SELECT ================= */
+
+input, select{
  padding:10px;
  border-radius:8px;
  border:1px solid #ccc;
- width:200px;
- margin-top:5px;
+ margin:5px 10px 10px 0;
+ min-width:180px;
 }
 
-/* BOTÕES PADRÃO */
+/* ================= BOTÕES ================= */
+
 button{
  padding:10px 24px;
  border:none;
@@ -67,31 +144,33 @@ button:hover{
  box-shadow:0 6px 14px rgba(0,0,0,.2);
 }
 
-/* TABELA */
+/* ================= TABELAS ================= */
+
 table{
  width:100%;
  border-collapse:collapse;
  margin-top:15px;
 }
 
-th,td{
- border:1px solid #ccc;
+th, td{
+ border:1px solid #ddd;
  padding:8px;
  text-align:center;
 }
 
 th{
- background:#eee;
+ background:#f0f0f0;
  font-weight:bold;
 }
 
-/* ESTOQUE */
-#estoqueAtual{
- color:var(--laranja);
- font-size:22px;
+/* ================= SEÇÕES ================= */
+
+.hidden{
+ display:none;
 }
 
-/* GRÁFICO */
+/* ================= GRÁFICO ================= */
+
 canvas{
  margin-top:20px;
 }
@@ -100,25 +179,43 @@ canvas{
 
 @media (max-width:768px){
 
-.box{
-    margin:15px;
-    padding:18px;
-    border-radius:20px;
+.container{
+ flex-direction:column;
+ height:auto;
 }
 
-input{
-    width:100%;
+.menu{
+ width:100%;
+ flex-direction:row;
+ overflow-x:auto;
+ gap:8px;
+}
+
+.menu button{
+ flex:0 0 auto;
+ white-space:nowrap;
+ font-size:14px;
+ padding:8px 14px;
+}
+
+.content{
+ padding:15px;
+}
+
+.box{
+ padding:18px;
+ border-radius:16px;
+}
+
+input, select{
+ width:100%;
+ margin:5px 0;
 }
 
 button{
-    width:100%;
-    padding:14px;
-    font-size:16px;
-}
-
-h1{
-    font-size:18px;
-    padding:15px;
+ width:100%;
+ padding:14px;
+ font-size:15px;
 }
 
 }

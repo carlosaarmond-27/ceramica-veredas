@@ -3,81 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cerâmica Veredas | Gestão 2.0</title>
+<title>Cerâmica Veredas | Sistema 2.1</title>
+
+<link rel="stylesheet" href="css/style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.js"></script>
-
-<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Cerâmica Veredas - Sistema 2.0</h1>
-
-<!-- PRODUÇÃO -->
-<div class="box">
-<h2>Registrar Produção</h2>
-
-<label>Data:
-<input type="date" id="data">
-</label>
-
-<br><br>
-
-<label>Total Produzido:
-<input type="number" id="total">
-</label>
-
-<br><br>
-
-<label>Fornos:
-<input type="number" id="fornos">
-</label>
-
-<br><br>
-
-<button onclick="salvarProducao()">Salvar Produção</button>
+<!-- TELA INICIAL -->
+<div id="startScreen" class="start">
+    <h1>Cerâmica Veredas</h1>
+    <button onclick="entrarSistema()">Entrar no Sistema</button>
 </div>
 
-<!-- TABELA PRODUÇÃO -->
-<div class="box">
-<h2>Produção Registrada</h2>
+<!-- SISTEMA -->
+<div id="sistema" class="hidden">
 
-<table>
-<thead>
-<tr>
-<th>Data</th>
-<th>Total</th>
-<th>Fornos</th>
-</tr>
-</thead>
-<tbody id="tabelaProducao"></tbody>
-</table>
+<header class="topo">
+    Sistema de Gestão Industrial 2.1
+</header>
 
-<br>
-<button onclick="exportarExcel()">Exportar CSV</button>
-</div>
+<div class="container">
+
+<nav class="menu">
+    <button onclick="mostrarSecao('painel')">Painel</button>
+    <button onclick="mostrarSecao('tipos')">Tipos</button>
+    <button onclick="mostrarSecao('diaria')">Produção Diária</button>
+    <button onclick="mostrarSecao('semanal')">Produção Semanal</button>
+    <button onclick="mostrarSecao('estoque')">Estoque</button>
+    <button onclick="mostrarSecao('graficos')">Gráficos</button>
+</nav>
+
+<main class="content">
+
+<!-- PAINEL -->
+<section id="painel" class="box">
+    <h2>Painel Geral</h2>
+    <p>Bem-vindo ao sistema industrial da Cerâmica Veredas.</p>
+</section>
+
+<!-- TIPOS -->
+<section id="tipos" class="box hidden">
+    <h2>Cadastrar Tipo de Tijolo</h2>
+    <input type="text" id="novoTipo" placeholder="Nome do tipo">
+    <button onclick="cadastrarTipo()">Cadastrar</button>
+
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Nome</th></tr>
+        </thead>
+        <tbody id="tabelaTipos"></tbody>
+    </table>
+</section>
+
+<!-- PRODUÇÃO DIÁRIA -->
+<section id="diaria" class="box hidden">
+    <h2>Produção Diária (Maromba)</h2>
+
+    <input type="date" id="dataDiaria">
+    <select id="tipoDiaria"></select>
+    <input type="number" id="produzido" placeholder="Produzido">
+    <input type="number" id="descarte" placeholder="Descarte">
+    <input type="number" id="horasParadas" placeholder="Horas Paradas">
+
+    <button onclick="salvarDiaria()">Salvar</button>
+</section>
+
+<!-- PRODUÇÃO SEMANAL -->
+<section id="semanal" class="box hidden">
+    <h2>Produção Semanal (Forno)</h2>
+
+    <input type="date" id="dataSemanal">
+    <select id="tipoSemanal"></select>
+    <input type="number" id="quantidadeQueimada" placeholder="Quantidade Queimada">
+    <input type="number" id="fornos" placeholder="Fornos Utilizados">
+
+    <button onclick="salvarSemanal()">Salvar</button>
+</section>
 
 <!-- ESTOQUE -->
-<div class="box">
-<h2>Estoque Atual</h2>
+<section id="estoque" class="box hidden">
+    <h2>Estoque Atual</h2>
 
-<p>Quantidade em Estoque: <b id="estoqueAtual">0</b></p>
+    <table>
+        <thead>
+            <tr><th>Tipo</th><th>Quantidade</th></tr>
+        </thead>
+        <tbody id="tabelaEstoque"></tbody>
+    </table>
 
-<br>
-<button onclick="registrarSaida()">Registrar Saída</button>
+    <h3>Registrar Saída</h3>
+    <select id="tipoSaida"></select>
+    <input type="number" id="quantidadeSaida" placeholder="Quantidade">
+    <button onclick="registrarSaida()">Registrar</button>
+</section>
+
+<!-- GRÁFICOS -->
+<section id="graficos" class="box hidden">
+    <h2>Gráficos</h2>
+
+    <button onclick="gerarGrafico('dia')">Dia</button>
+    <button onclick="gerarGrafico('mes')">Mês</button>
+    <button onclick="gerarGrafico('ano')">Ano</button>
+
+    <canvas id="grafico"></canvas>
+</section>
+
+</main>
+</div>
 </div>
 
-<!-- GRÁFICO -->
-<div class="box">
-<h2>Gráfico de Produção</h2>
-<canvas id="grafico"></canvas>
-<br>
-<button onclick="gerarGrafico()">Atualizar Gráfico</button>
-</div>
-
-<script src="script.js"></script>
+<script src="js/script.js"></script>
 
 </body>
 </html>
