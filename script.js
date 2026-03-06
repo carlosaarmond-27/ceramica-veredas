@@ -3,7 +3,7 @@
 // ===============================
 const supabaseUrl = 'https://ctjlmweuplsgkgbgmoad.supabase.co';
 const supabaseKey = 'sb_publishable_DJrfzGVemmqakKE9yJtfwA_HsaZtvR2';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ===============================
 // FATORES DOS TIJOLOS
@@ -43,7 +43,7 @@ async function cadastrarTipo(){
 
   if(!nome) return alert("Digite um nome.");
 
-  await supabase.from("tipos").insert([{ nome }]);
+  await db.from("tipos").insert([{ nome }]);
 
   document.getElementById("novoTipo").value="";
 
@@ -52,7 +52,7 @@ async function cadastrarTipo(){
 
 async function carregarTipos(){
 
-  const { data } = await supabase.from("tipos").select("*").order("id");
+  const { data } = await db.from("tipos").select("*").order("id");
 
   const tabela = document.getElementById("tabelaTipos");
 
@@ -91,7 +91,7 @@ async function salvarDiaria(){
 
   const liquido = produzido - (descarte || 0);
 
-  await supabase.from("producao_diaria").insert([{
+  await db.from("producao_diaria").insert([{
     data,
     tipo_id,
     produzido,
@@ -118,7 +118,7 @@ async function salvarSemanal(){
     return alert("Preencha os campos obrigatórios.");
 
   // buscar nome do tipo
-  const { data: tipoData } = await supabase
+  const { data: tipoData } = await db
     .from("tipos")
     .select("nome")
     .eq("id", tipo_id)
@@ -132,7 +132,7 @@ async function salvarSemanal(){
   // equivalente para controle de forno
   const equivalente = quantidade * fator;
 
-  await supabase.from("producao_semanal").insert([{
+  await db.from("producao_semanal").insert([{
     data,
     tipo_id,
     quantidade,
@@ -154,7 +154,7 @@ Equivalente forno: ${Math.round(equivalente)}`);
 
 async function atualizarEstoque(tipo_id, qtd){
 
-  const { data } = await supabase
+  const { data } = await db
     .from("estoque")
     .select("*")
     .eq("tipo_id", tipo_id);
@@ -168,7 +168,7 @@ async function atualizarEstoque(tipo_id, qtd){
 
     const novaQtd = data[0].quantidade + qtd;
 
-    await supabase.from("estoque")
+    await db.from("estoque")
     .update({ quantidade: novaQtd })
     .eq("tipo_id", tipo_id);
 
@@ -179,7 +179,7 @@ async function atualizarEstoque(tipo_id, qtd){
 
 async function carregarEstoque(){
 
-  const { data } = await supabase
+  const { data } = await db
     .from("estoque")
     .select("quantidade, tipos(nome)")
     .order("tipo_id");
@@ -212,7 +212,7 @@ async function registrarSaida(){
 
   if(!qtd || qtd<=0) return alert("Quantidade inválida.");
 
-  const { data } = await supabase
+  const { data } = await db
     .from("estoque")
     .select("*")
     .eq("tipo_id", tipo_id);
@@ -222,11 +222,11 @@ async function registrarSaida(){
 
   const novaQtd = data[0].quantidade - qtd;
 
-  await supabase.from("estoque")
+  await db.from("estoque")
     .update({ quantidade: novaQtd })
     .eq("tipo_id", tipo_id);
 
-  await supabase.from("saidas_estoque").insert([{
+  await db.from("saidas_estoque").insert([{
     tipo_id,
     quantidade: qtd,
     data: new Date()
@@ -245,7 +245,7 @@ let grafico;
 
 async function gerarGrafico(filtro){
 
-  const { data } = await supabase
+  const { data } = await db
     .from("producao_diaria")
     .select("*")
     .order("data");
