@@ -161,7 +161,7 @@ async function atualizarEstoque(tipo_id, qtd){
 
   if(data.length === 0){
 
-    await supabase.from("estoque")
+    await db.from("estoque")
     .insert([{ tipo_id, quantidade: qtd }]);
 
   }else{
