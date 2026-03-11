@@ -14,6 +14,25 @@ body{
  background:var(--cinza);
 }
 
+/* ================= LOGO ================= */
+
+.logo{
+ height:60px;
+ vertical-align:middle;
+ margin-right:10px;
+}
+
+header{
+ display:flex;
+ align-items:center;
+ gap:15px;
+}
+
+header img{
+ width:120px;
+ height:auto;
+}
+
 /* ================= TELA INICIAL ================= */
 
 .start{
@@ -219,18 +238,17 @@ button{
 }
 
 .logo{
-height:40px;
-vertical-align:middle;
-margin-right:10px;
-}
-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+ height:40px;
 }
 
-header img {
-  width: 120px;
-  height: auto;
+header img{
+ width:90px;
 }
+
+.logo-start{
+ width:220px;
+ margin-bottom:25px;
+ filter: drop-shadow(0 8px 20px rgba(0,0,0,.4));
+}
+
 }
