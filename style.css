@@ -224,4 +224,15 @@ vertical-align:middle;
 margin-right:10px;
 }
 
+header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+header img {
+  width: 120px;
+  height: auto;
+}
+
 }
