@@ -223,7 +223,6 @@ height:40px;
 vertical-align:middle;
 margin-right:10px;
 }
-
 header {
   display: flex;
   align-items: center;
@@ -234,5 +233,4 @@ header img {
   width: 120px;
   height: auto;
 }
-
 }
