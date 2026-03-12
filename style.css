@@ -33,6 +33,14 @@ header img{
  height:auto;
 }
 
+/* LOGO DA TELA INICIAL */
+
+.logo-start{
+ width:180px;
+ margin-bottom:25px;
+ filter: drop-shadow(0 8px 20px rgba(0,0,0,.4));
+}
+
 /* ================= TELA INICIAL ================= */
 
 .start{
@@ -134,7 +142,7 @@ header img{
  color:var(--verde);
 }
 
-/* ================= INPUTS E SELECT ================= */
+/* ================= INPUTS ================= */
 
 input, select{
  padding:10px;
@@ -246,9 +254,7 @@ header img{
 }
 
 .logo-start{
- width: 110px;
- margin-bottom:25px;
- filter: drop-shadow(0 8px 20px rgba(0,0,0,.4));
+ width:140px;
 }
 
 }
