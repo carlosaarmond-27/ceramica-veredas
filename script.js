@@ -241,31 +241,78 @@ async function registrarSaida(){
 // GRÁFICOS
 // ===============================
 
-let grafico;
-
 async function gerarGrafico(filtro){
 
-  const { data } = await db
-    .from("producao_diaria")
-    .select("*")
-    .order("data");
+  let labels = [];
+  let valores = [];
 
-  let agrupado = {};
+  // ================= DIA (produção diária) =================
 
-  data.forEach(item=>{
+  if(filtro === "dia"){
 
-    let chave;
+    const { data, error } = await db
+      .from("producao_diaria")
+      .select("data, liquido")
+      .order("data");
 
-    if(filtro==="dia") chave = item.data;
-    if(filtro==="mes") chave = item.data.slice(0,7);
-    if(filtro==="ano") chave = item.data.slice(0,4);
+    if(error || !data) return alert("Erro ao carregar dados.");
 
-    agrupado[chave] = (agrupado[chave] || 0) + item.liquido;
+    let agrupado = {};
 
-  });
+    data.forEach(item=>{
+      agrupado[item.data] = (agrupado[item.data] || 0) + item.liquido;
+    });
 
-  const labels = Object.keys(agrupado);
-  const valores = Object.values(agrupado);
+    labels = Object.keys(agrupado);
+    valores = Object.values(agrupado);
+
+  }
+
+  // ================= MÊS (produção semanal / forno) =================
+
+  if(filtro === "mes"){
+
+    const { data, error } = await db
+      .from("producao_semanal")
+      .select("data, quantidade")
+      .order("data");
+
+    if(error || !data) return alert("Erro ao carregar dados.");
+
+    let agrupado = {};
+
+    data.forEach(item=>{
+      const mes = item.data.slice(0,7);
+      agrupado[mes] = (agrupado[mes] || 0) + item.quantidade;
+    });
+
+    labels = Object.keys(agrupado);
+    valores = Object.values(agrupado);
+
+  }
+
+  // ================= ANO (produção total) =================
+
+  if(filtro === "ano"){
+
+    const { data, error } = await db
+      .from("producao_semanal")
+      .select("data, quantidade")
+      .order("data");
+
+    if(error || !data) return alert("Erro ao carregar dados.");
+
+    let agrupado = {};
+
+    data.forEach(item=>{
+      const ano = item.data.slice(0,4);
+      agrupado[ano] = (agrupado[ano] || 0) + item.quantidade;
+    });
+
+    labels = Object.keys(agrupado);
+    valores = Object.values(agrupado);
+
+  }
 
   const ctx = document.getElementById("grafico").getContext("2d");
 
@@ -274,15 +321,23 @@ async function gerarGrafico(filtro){
   grafico = new Chart(ctx,{
     type:"bar",
     data:{
-      labels,
+      labels:labels,
       datasets:[{
-        label:"Produção Líquida",
-        data:valores
+        label:"Produção",
+        data:valores,
+        backgroundColor:"#008c4a"
       }]
+    },
+    options:{
+      responsive:true,
+      scales:{
+        y:{beginAtZero:true}
+      }
     }
   });
 
 }
+
 
 // ===============================
 // INICIALIZAÇÃO
