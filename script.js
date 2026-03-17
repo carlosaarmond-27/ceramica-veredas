@@ -237,17 +237,18 @@ async function registrarSaida(){
   alert("Saída registrada.");
 }
 
-// ===============================
+/// ===============================
 // GRÁFICOS
 // ===============================
+
+let grafico = null;
 
 async function gerarGrafico(filtro){
 
   let labels = [];
   let valores = [];
 
-  // ================= DIA (produção diária) =================
-
+  // ================= DIA =================
   if(filtro === "dia"){
 
     const { data, error } = await db
@@ -265,11 +266,9 @@ async function gerarGrafico(filtro){
 
     labels = Object.keys(agrupado);
     valores = Object.values(agrupado);
-
   }
 
-  // ================= MÊS (produção semanal / forno) =================
-
+  // ================= MÊS =================
   if(filtro === "mes"){
 
     const { data, error } = await db
@@ -288,11 +287,9 @@ async function gerarGrafico(filtro){
 
     labels = Object.keys(agrupado);
     valores = Object.values(agrupado);
-
   }
 
-  // ================= ANO (produção total) =================
-
+  // ================= ANO =================
   if(filtro === "ano"){
 
     const { data, error } = await db
@@ -311,12 +308,21 @@ async function gerarGrafico(filtro){
 
     labels = Object.keys(agrupado);
     valores = Object.values(agrupado);
-
   }
 
-  const ctx = document.getElementById("grafico").getContext("2d");
+  const canvas = document.getElementById("grafico");
 
-  if(grafico) grafico.destroy();
+  if(!canvas){
+    console.error("Canvas não encontrado");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  // 🔥 CORREÇÃO PRINCIPAL
+  if(grafico && typeof grafico.destroy === "function"){
+    grafico.destroy();
+  }
 
   grafico = new Chart(ctx,{
     type:"bar",
@@ -337,6 +343,8 @@ async function gerarGrafico(filtro){
   });
 
 }
+
+
 
 
 // ===============================
