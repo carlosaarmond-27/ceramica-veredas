@@ -237,7 +237,7 @@ async function registrarSaida(){
   alert("Saída registrada.");
 }
 
-/// ===============================
+// ===============================
 // GRÁFICOS
 // ===============================
 
@@ -247,6 +247,21 @@ async function gerarGrafico(filtro){
 
   let labels = [];
   let valores = [];
+
+  const canvas = document.getElementById("grafico");
+
+  if(!canvas){
+    console.error("Canvas não encontrado");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  // destruir gráfico anterior com segurança
+  if(grafico && typeof grafico.destroy === "function"){
+    grafico.destroy();
+    grafico = null;
+  }
 
   // ================= DIA =================
   if(filtro === "dia"){
@@ -264,29 +279,70 @@ async function gerarGrafico(filtro){
       agrupado[item.data] = (agrupado[item.data] || 0) + item.liquido;
     });
 
-    labels = Object.keys(agrupado);
+    labels = Object.keys(agrupado).sort();
     valores = Object.values(agrupado);
   }
 
   // ================= MÊS =================
   if(filtro === "mes"){
 
+    const mesSelecionado = document.getElementById("filtroMes").value;
+
+    if(!mesSelecionado){
+      alert("Selecione um mês.");
+      return;
+    }
+
     const { data, error } = await db
       .from("producao_semanal")
-      .select("data, quantidade")
+      .select("data, quantidade, fornos")
+      .gte("data", mesSelecionado + "-01")
+      .lte("data", mesSelecionado + "-31")
       .order("data");
 
     if(error || !data) return alert("Erro ao carregar dados.");
 
-    let agrupado = {};
+    let producaoDia = {};
+    let fornosDia = {};
 
     data.forEach(item=>{
-      const mes = item.data.slice(0,7);
-      agrupado[mes] = (agrupado[mes] || 0) + item.quantidade;
+      const dia = item.data;
+
+      producaoDia[dia] = (producaoDia[dia] || 0) + item.quantidade;
+      fornosDia[dia] = (fornosDia[dia] || 0) + (item.fornos || 0);
     });
 
-    labels = Object.keys(agrupado);
-    valores = Object.values(agrupado);
+    labels = Object.keys(producaoDia).sort();
+
+    const valoresProducao = labels.map(dia => producaoDia[dia]);
+    const valoresFornos = labels.map(dia => fornosDia[dia]);
+
+    grafico = new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels:labels,
+        datasets:[
+          {
+            label:"Produção",
+            data:valoresProducao,
+            backgroundColor:"#008c4a"
+          },
+          {
+            label:"Fornos",
+            data:valoresFornos,
+            backgroundColor:"#d66a00"
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        scales:{
+          y:{beginAtZero:true}
+        }
+      }
+    });
+
+    return;
   }
 
   // ================= ANO =================
@@ -306,22 +362,8 @@ async function gerarGrafico(filtro){
       agrupado[ano] = (agrupado[ano] || 0) + item.quantidade;
     });
 
-    labels = Object.keys(agrupado);
+    labels = Object.keys(agrupado).sort();
     valores = Object.values(agrupado);
-  }
-
-  const canvas = document.getElementById("grafico");
-
-  if(!canvas){
-    console.error("Canvas não encontrado");
-    return;
-  }
-
-  const ctx = canvas.getContext("2d");
-
-  // 🔥 CORREÇÃO PRINCIPAL
-  if(grafico && typeof grafico.destroy === "function"){
-    grafico.destroy();
   }
 
   grafico = new Chart(ctx,{
@@ -341,8 +383,18 @@ async function gerarGrafico(filtro){
       }
     }
   });
-
 }
+
+// ===============================
+// DEFINIR MÊS AUTOMÁTICO
+// ===============================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const inputMes = document.getElementById("filtroMes");
+  if(inputMes){
+    inputMes.value = new Date().toISOString().slice(0,7);
+  }
+});
 
 
 
